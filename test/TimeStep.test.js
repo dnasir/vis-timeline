@@ -91,6 +91,25 @@ describe('TimeStep', () => {
     assert.equal(getUnixTime(timestep.getCurrent()), getUnixTime(parseISO("2017-04-03T00:00:00.000")), "should have the right initial value");
     timestep.next();
     assert.equal(getUnixTime(timestep.getCurrent()), getUnixTime(parseISO("2017-04-03T01:00:00.000")), "should have the right value after a step");
+    timestep.setScale({ scale: 'hour', step: 2 });
+    timestep.next();
+    assert.equal(getUnixTime(timestep.getCurrent()), getUnixTime(parseISO("2017-04-03T03:00:00.000")), "should have the right value after a step (step=2)");
+    timestep.next();
+    assert.equal(getUnixTime(timestep.getCurrent()), getUnixTime(parseISO("2017-04-03T05:00:00.000")), "should have the right value after a step (step=2)");
+  });
+
+  it('should perform the step with a specified scale (1 minute)', () => {
+    const timestep = new TimeStep(new Date(2017, 3, 3), new Date(2017, 3, 5));
+    timestep.setScale({ scale: 'minute', step: 1 });
+    timestep.start();
+    assert.equal(getUnixTime(timestep.getCurrent()), getUnixTime(parseISO("2017-04-03T00:00:00.000")), "should have the right initial value");
+    timestep.next();
+    assert.equal(getUnixTime(timestep.getCurrent()), getUnixTime(parseISO("2017-04-03T00:01:00.000")), "should have the right value after a step");
+    timestep.setScale({ scale: 'minute', step: 2 });
+    timestep.next();
+    assert.equal(getUnixTime(timestep.getCurrent()), getUnixTime(parseISO("2017-04-03T00:03:00.000")), "should have the right value after a step (step=2)");
+    timestep.next();
+    assert.equal(getUnixTime(timestep.getCurrent()), getUnixTime(parseISO("2017-04-03T00:05:00.000")), "should have the right value after a step (step=2)");
   });
 
   describe('isMajor', () => {
