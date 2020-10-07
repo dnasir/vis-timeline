@@ -159,6 +159,11 @@ describe('TimeStep', () => {
       timestep.setScale({ scale: 'day', step: 1 });
       assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1)), '1', 'should be correct minor label');
     });
+    it('should return the correct minor label (weekday)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'weekday', step: 1 });
+      assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1)), 'Sat 1', 'should be correct minor label');
+    });
     it('should return the correct minor label (hour)', () => {
       const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
       timestep.setScale({ scale: 'hour', step: 1 });
