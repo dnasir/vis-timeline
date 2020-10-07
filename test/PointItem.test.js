@@ -1,15 +1,15 @@
 import assert from 'assert'
 import jsdom_global from 'jsdom-global'
-import moment from '../lib/module/moment'
 import PointItem from "../lib/timeline/component/item/PointItem"
 import Range from '../lib/timeline/Range'
 import TestSupport from './TestSupport'
+import add from 'date-fns/add';
 
 const internals = {}
 
 describe('Timeline PointItem', () => {
   
-  const now = moment();
+  const now = Date.now();
 
   before(() => {
     internals.jsdom_global = jsdom_global();
@@ -20,9 +20,9 @@ describe('Timeline PointItem', () => {
   });
 
   it('should initialize with minimal data', () => {
-    const pointItem = new PointItem({start: now.toDate()}, null, null);
+    const pointItem = new PointItem({start: now}, null, null);
     assert.equal(pointItem.props.content.height, 0);
-    assert.deepEqual(pointItem.data.start, now.toDate());
+    assert.deepEqual(pointItem.data.start, now);
   });
 
   it('should have a default width of 0', () => {
@@ -37,32 +37,32 @@ describe('Timeline PointItem', () => {
 
   it('should be visible if the range is during', () => {
     const range = new Range(TestSupport.buildSimpleTimelineRangeBody());
-    range.start = now.clone().add(-1, 'second');
-    range.end = range.start.clone().add(1, 'hour');
-    const pointItem = new PointItem({start: now.toDate()}, null, null);
+    range.start = add(now, { seconds: -1 });
+    range.end = add(range.start, { hours: 1 });
+    const pointItem = new PointItem({start: now}, null, null);
     assert(pointItem.isVisible(range));
   });
 
   it('should not be visible if the range is after', () => {
     const range = new Range(TestSupport.buildSimpleTimelineRangeBody());
-    range.start = now.clone().add(1, 'second');
-    range.end = range.start.clone().add(1, 'hour');
-    const pointItem = new PointItem({start: now.toDate()}, null, null);
+    range.start = add(now, { seconds: 1 });
+    range.end = add(range.start, { hours: 1 });
+    const pointItem = new PointItem({start: now}, null, null);
     assert(!pointItem.isVisible(range));
   });
 
   it('should not be visible if the range is before', () => {
-    const now = moment();
+    const now = Date.now();
     const range = new Range(TestSupport.buildSimpleTimelineRangeBody());
-    range.end = now.clone().add(-1, 'second');
-    range.start = range.end.clone().add(-1, 'hour');
-    const pointItem = new PointItem({start: now.toDate()}, null, null);
+    range.end = add(now, { seconds: -1 });
+    range.start = add(range.end, { hours: -1 });
+    const pointItem = new PointItem({start: now}, null, null);
     assert(!pointItem.isVisible(range));
   });
 
   it('should be visible for a "now" point with a default range', () => {
     const range = new Range(TestSupport.buildSimpleTimelineRangeBody());
-    const pointItem = new PointItem({start: now.toDate()}, null, null);
+    const pointItem = new PointItem({start: now}, null, null);
     assert(pointItem.isVisible(range));
   });
 
@@ -70,7 +70,7 @@ describe('Timeline PointItem', () => {
 describe('should redraw() and then', () => {
 
   it('not be dirty', () => {
-    const pointItem = new PointItem({start: now.toDate()}, null, {editable: false});
+    const pointItem = new PointItem({start: now}, null, {editable: false});
     pointItem.setParent(TestSupport.buildMockItemSet());
     assert(pointItem.dirty);
     pointItem.redraw();
@@ -79,7 +79,7 @@ describe('should redraw() and then', () => {
 
 
   it('have point attached to its parent', () => {
-    const pointItem = new PointItem({start: now.toDate()}, null, {editable: false});
+    const pointItem = new PointItem({start: now}, null, {editable: false});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     assert(!parent.dom.foreground.hasChildNodes());
@@ -91,7 +91,7 @@ describe('should redraw() and then', () => {
 describe('have the correct classname for', () => {
 
   it('a non-editable item', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: false}, null, {editable: false});
+    const pointItem = new PointItem({start: now, editable: false}, null, {editable: false});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -100,7 +100,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable item (with object option)', () => {
-    const pointItem = new PointItem({start: now.toDate()}, null, {editable: {updateTime: true, updateGroup: false}});
+    const pointItem = new PointItem({start: now}, null, {editable: {updateTime: true, updateGroup: false}});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -109,7 +109,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable item (with boolean option)', () => {
-    const pointItem = new PointItem({start: now.toDate()}, null, {editable: true});
+    const pointItem = new PointItem({start: now}, null, {editable: true});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -118,7 +118,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable:false override item (with boolean option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: false}, null, {editable: true});
+    const pointItem = new PointItem({start: now, editable: false}, null, {editable: true});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -127,7 +127,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable:true override item (with boolean option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: true}, null, {editable: false});
+    const pointItem = new PointItem({start: now, editable: true}, null, {editable: false});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -136,7 +136,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable:false override item (with object option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: false}, null, {editable: {updateTime: true, updateGroup: false}});
+    const pointItem = new PointItem({start: now, editable: false}, null, {editable: {updateTime: true, updateGroup: false}});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -145,7 +145,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable:false override item (with object option for group change)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: false}, null, {editable: {updateTime: false, updateGroup: true}});
+    const pointItem = new PointItem({start: now, editable: false}, null, {editable: {updateTime: false, updateGroup: true}});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -154,7 +154,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable:true override item (with object option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: true}, null, {editable: {updateTime: false, updateGroup: false}});
+    const pointItem = new PointItem({start: now, editable: true}, null, {editable: {updateTime: false, updateGroup: false}});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -163,7 +163,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable:true non-override item (with object option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: true}, null, {editable: {updateTime: false, updateGroup: false, overrideItems: true}});
+    const pointItem = new PointItem({start: now, editable: true}, null, {editable: {updateTime: false, updateGroup: false, overrideItems: true}});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -172,7 +172,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable:false non-override item (with object option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: false}, null, {editable: {updateTime: true, updateGroup: false, overrideItems: true}});
+    const pointItem = new PointItem({start: now, editable: false}, null, {editable: {updateTime: true, updateGroup: false, overrideItems: true}});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -181,7 +181,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable: {updateTime} override item (with boolean option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: {updateTime: true}}, null, {editable: true});
+    const pointItem = new PointItem({start: now, editable: {updateTime: true}}, null, {editable: true});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -191,7 +191,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable: {updateTime} override item (with boolean option false)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: {updateTime: true}}, null, {editable: false});
+    const pointItem = new PointItem({start: now, editable: {updateTime: true}}, null, {editable: false});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -201,7 +201,7 @@ describe('have the correct classname for', () => {
   });
 
   it('an editable: {updateGroup} override item (with boolean option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: {updateGroup: true}}, null, {editable: true});
+    const pointItem = new PointItem({start: now, editable: {updateGroup: true}}, null, {editable: true});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -216,7 +216,7 @@ describe('have the correct classname for', () => {
 describe('have the correct property for', () => {
 
   it('an editable: {updateGroup} override item (with boolean option false)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: {updateGroup: true}}, null, {editable: false});
+    const pointItem = new PointItem({start: now, editable: {updateGroup: true}}, null, {editable: false});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -226,7 +226,7 @@ describe('have the correct property for', () => {
   });
 
   it('an editable: {remove} override item (with boolean option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: {remove: true}}, null, {editable: true});
+    const pointItem = new PointItem({start: now, editable: {remove: true}}, null, {editable: true});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -236,7 +236,7 @@ describe('have the correct property for', () => {
   });
 
   it('an editable: {remove} override item (with boolean option false)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: {remove: true}}, null, {editable: false});
+    const pointItem = new PointItem({start: now, editable: {remove: true}}, null, {editable: false});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -246,7 +246,7 @@ describe('have the correct property for', () => {
   });
 
   it('an editable: {updateTime, remove} override item (with boolean option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: {updateTime: true, remove: true}}, null, {editable: true});
+    const pointItem = new PointItem({start: now, editable: {updateTime: true, remove: true}}, null, {editable: true});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -256,7 +256,7 @@ describe('have the correct property for', () => {
   });
 
   it('an editable: {updateTime, remove} override item (with boolean option false)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: {updateTime: true, remove: true}}, null, {editable: false});
+    const pointItem = new PointItem({start: now, editable: {updateTime: true, remove: true}}, null, {editable: false});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -266,7 +266,7 @@ describe('have the correct property for', () => {
   });
 
   it('an editable: {updateTime, updateGroup, remove} override item (with boolean option)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: {updateTime: true, updateGroup: true, remove: true}}, null, {editable: true});
+    const pointItem = new PointItem({start: now, editable: {updateTime: true, updateGroup: true, remove: true}}, null, {editable: true});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
@@ -276,7 +276,7 @@ describe('have the correct property for', () => {
   });
 
   it('an editable: {updateTime, updateGroup, remove} override item (with boolean option false)', () => {
-    const pointItem = new PointItem({start: now.toDate(), editable: {updateTime: true, updateGroup: true, remove: true}}, null, {editable: false});
+    const pointItem = new PointItem({start: now, editable: {updateTime: true, updateGroup: true, remove: true}}, null, {editable: false});
     const parent = TestSupport.buildMockItemSet();
     pointItem.setParent(parent);
     pointItem.redraw();
