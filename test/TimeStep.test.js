@@ -185,4 +185,52 @@ describe('TimeStep', () => {
       assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1, 12, 45, 35, 123)), '123', 'should be correct minor label');
     });
   });
+
+  describe('getLabelMajor', () => {
+    it('should return the correct major label (year)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'year', step: 1 });
+      assert.equal(timestep.getLabelMajor(new Date(2017, 3, 1)), '', 'should be correct major label');
+    });
+    it('should return the correct major label (month)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'month', step: 1 });
+      assert.equal(timestep.getLabelMajor(new Date(2017, 3, 1)), '2017', 'should be correct major label');
+    });
+    it('should return the correct major label (week)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'week', step: 1 });
+      assert.equal(timestep.getLabelMajor(new Date(2017, 3, 1)), 'April 2017', 'should be correct major label');
+    });
+    it('should return the correct major label (day)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'day', step: 1 });
+      assert.equal(timestep.getLabelMajor(new Date(2017, 3, 1)), 'April 2017', 'should be correct major label');
+    });
+    it('should return the correct major label (weekday)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'day', step: 1 });
+      assert.equal(timestep.getLabelMajor(new Date(2017, 3, 1)), 'April 2017', 'should be correct major label');
+    });
+    it('should return the correct major label (hour)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'hour', step: 1 });
+      assert.equal(timestep.getLabelMajor(new Date(2017, 3, 1, 12, 45)), 'Sat 1 April', 'should be correct major label');
+    });
+    it('should return the correct major label (minute)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'minute', step: 1 });
+      assert.equal(timestep.getLabelMajor(new Date(2017, 3, 1, 12, 45)), 'Sat 1 April', 'should be correct major label');
+    });
+    it('should return the correct major label (second)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'second', step: 1 });
+      assert.equal(timestep.getLabelMajor(new Date(2017, 3, 1, 12, 45, 35)), '1 April 12:45', 'should be correct major label');
+    });
+    it('should return the correct major label (millisecond)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'millisecond', step: 1 });
+      assert.equal(timestep.getLabelMajor(new Date(2017, 3, 1, 12, 45, 35, 123)), '12:45:35', 'should be correct major label');
+    });
+  });
 });
