@@ -136,4 +136,48 @@ describe('TimeStep', () => {
       assert.equal(timestep.isMajor(), true, 'should be major value');
     });
   });
+
+  describe('getLabelMinor', () => {
+    it('should return the correct minor label (year)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'year', step: 1 });
+      assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1)), '2017', 'should be correct minor label');
+    });
+    it('should return the correct minor label (month)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'month', step: 1 });
+      assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1)), 'Apr', 'should be correct minor label');
+    });
+    it('should return the correct minor label (week)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'week', step: 1 });
+      assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1)), '', 'should be empty for 1st day of the month that is not the first day of the week');
+      assert.equal(timestep.getLabelMinor(new Date(2017, 0, 1)), '1', 'should be correct minor label');
+    });
+    it('should return the correct minor label (day)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'day', step: 1 });
+      assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1)), '1', 'should be correct minor label');
+    });
+    it('should return the correct minor label (hour)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'hour', step: 1 });
+      assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1, 12, 45)), '12:45', 'should be correct minor label');
+    });
+    it('should return the correct minor label (minute)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'minute', step: 1 });
+      assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1, 12, 45)), '12:45', 'should be correct minor label');
+    });
+    it('should return the correct minor label (second)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'second', step: 1 });
+      assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1, 12, 45, 35)), '35', 'should be correct minor label');
+    });
+    it('should return the correct minor label (millisecond)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'millisecond', step: 1 });
+      assert.equal(timestep.getLabelMinor(new Date(2017, 3, 1, 12, 45, 35, 123)), '123', 'should be correct minor label');
+    });
+  });
 });
