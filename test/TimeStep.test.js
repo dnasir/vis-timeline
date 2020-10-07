@@ -233,4 +233,99 @@ describe('TimeStep', () => {
       assert.equal(timestep.getLabelMajor(new Date(2017, 3, 1, 12, 45, 35, 123)), '12:45:35', 'should be correct major label');
     });
   });
+
+  describe('getClassName', () => {
+    let originalDateNow;
+
+    beforeEach(() => {
+      originalDateNow = Date.now;
+      Date.now = mockDateNow;
+    });
+    afterEach(() => {
+      Date.now = originalDateNow;
+    });
+
+    it('should return the correct class name (year)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'year', step: 1 });
+      timestep.current = new Date(2017, 3, 1);
+      assert.equal(timestep.getClassName(), 'vis-year2017 vis-odd', 'should be correct class name');
+      timestep.current = new Date(2020, 3, 1);
+      assert.equal(timestep.getClassName(), 'vis-year2020 vis-current-year vis-even', 'should be correct class name');
+    });
+    it('should return the correct class name (month)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'month', step: 1 });
+      timestep.current = new Date(2017, 3, 1);
+      assert.equal(timestep.getClassName(), 'vis-april vis-odd', 'should be correct class name');
+      timestep.current = new Date(2020, 9, 1);
+      assert.equal(timestep.getClassName(), 'vis-october vis-current-month vis-odd', 'should be correct class name');
+    });
+    it('should return the correct class name (week)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'week', step: 1 });
+      timestep.current = new Date(2017, 3, 1);
+      assert.equal(timestep.getClassName(), 'vis-week13 vis-odd', 'should be correct class name');
+      timestep.current = new Date(2020, 9, 5);
+      assert.equal(timestep.getClassName(), 'vis-week41 vis-current-week vis-odd', 'should be correct class name');
+    });
+    it('should return the correct class name (day)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'day', step: 1 });
+      timestep.current = new Date(2017, 3, 1);
+      assert.equal(timestep.getClassName(), 'vis-day1 vis-april vis-saturday vis-even', 'should be correct class name');
+      timestep.current = new Date(2020, 9, 7);
+      assert.equal(timestep.getClassName(), 'vis-day7 vis-october vis-current-month vis-today vis-wednesday vis-even', 'should be correct class name');
+    });
+    it('should return the correct class name (weekday)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'weekday', step: 1 });
+      timestep.current = new Date(2017, 3, 1);
+      assert.equal(timestep.getClassName(), 'vis-saturday vis-odd', 'should be correct class name');
+      timestep.current = new Date(2020, 9, 7);
+      assert.equal(timestep.getClassName(), 'vis-wednesday vis-today vis-current-week vis-odd', 'should be correct class name');
+    });
+    it('should return the correct class name (hour)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'hour', step: 1 });
+      timestep.current = new Date(2017, 3, 1, 12, 45);
+      assert.equal(timestep.getClassName(), 'vis-h12 vis-even', 'should be correct class name');
+      timestep.current = new Date(2020, 9, 7, 12, 45);
+      assert.equal(timestep.getClassName(), 'vis-h12 vis-today vis-even', 'should be correct class name');
+      timestep.setScale({ scale: 'hour', step: 4 });
+      timestep.current = new Date(2017, 3, 1, 12, 45);
+      assert.equal(timestep.getClassName(), 'vis-h12-h16 vis-odd', 'should handle special case for step=4');
+      timestep.current = new Date(2020, 9, 7, 12, 45);
+      assert.equal(timestep.getClassName(), 'vis-h12-h16 vis-today vis-odd', 'should handle special case for step=4');
+    });
+    it('should return the correct class name (minute)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'minute', step: 1 });
+      timestep.current = new Date(2017, 3, 1, 12, 45);
+      assert.equal(timestep.getClassName(), 'vis-odd', 'should be correct class name');
+      timestep.current = new Date(2020, 9, 7, 12, 45);
+      assert.equal(timestep.getClassName(), 'vis-today vis-odd', 'should be correct class name');
+    });
+    it('should return the correct class name (second)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'second', step: 1 });
+      timestep.current = new Date(2017, 3, 1, 12, 45, 35);
+      assert.equal(timestep.getClassName(), 'vis-odd', 'should be correct class name');
+      timestep.current = new Date(2020, 9, 7, 12, 45, 35);
+      assert.equal(timestep.getClassName(), 'vis-today vis-odd', 'should be correct class name');
+    });
+    it('should return the correct class name (millisecond)', () => {
+      const timestep = new TimeStep(new Date(2017, 0, 1), new Date(2018, 11, 31));
+      timestep.setScale({ scale: 'millisecond', step: 1 });
+      timestep.current = new Date(2017, 3, 1, 12, 4, 35, 300);
+      assert.equal(timestep.getClassName(), 'vis-even', 'should be correct class name');
+      timestep.current = new Date(2020, 9, 7, 12, 45, 35, 300);
+      assert.equal(timestep.getClassName(), 'vis-today vis-even', 'should be correct class name');
+    });
+  });
 });
+
+// eslint-disable-next-line require-jsdoc
+function mockDateNow() {
+  return 1602054000000; // 2020-10-07T07:00:00.000Z
+}
