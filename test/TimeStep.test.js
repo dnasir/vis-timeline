@@ -3,6 +3,7 @@ import jsdom_global from 'jsdom-global'
 import TimeStep from '../lib/timeline/TimeStep'
 import parseISO from 'date-fns/parseISO'
 import getUnixTime from 'date-fns/getUnixTime'
+import mockery from 'mockery';
 
 const internals = {}
 
@@ -253,15 +254,20 @@ describe('TimeStep', () => {
     });
   });
 
-  describe('getClassName', () => {
-    let originalDateNow;
+  describe('getClassName', function() {
+    // Stub to ensure we get the same value for `new Date()` and `Date.now()` every single time it's called.
+    let mockDate = global.Date;
+    mockDate.constructor = (value) => {
+      if(value) return global.Date(value);
+      return new Date(1602054000000);
+    };
+    mockDate.now = () => 1602054000000;
 
-    beforeEach(() => {
-      originalDateNow = Date.now;
-      Date.now = mockDateNow;
+    before(function() {
+      mockery.registerMock('../module/date', mockDate);
     });
-    afterEach(() => {
-      Date.now = originalDateNow;
+    after(function() {
+      mockery.disable();
     });
 
     it('should return the correct class name (year)', () => {
@@ -343,8 +349,3 @@ describe('TimeStep', () => {
     });
   });
 });
-
-// eslint-disable-next-line require-jsdoc
-function mockDateNow() {
-  return 1602054000000; // 2020-10-07T07:00:00.000Z
-}
