@@ -1,6 +1,5 @@
 import assert from 'assert'
 import jsdom_global from 'jsdom-global'
-import moment from '../lib/module/moment'
 import Range from '../lib/timeline/Range'
 import TestSupport from './TestSupport'
 
@@ -17,13 +16,13 @@ describe('Timeline Range', () => {
   });
 
   it('should have start default before now', () => {
-    const now = moment().hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+    const now = new Date().setHours(0, 0, 0, 0);
     const range = new Range(TestSupport.buildSimpleTimelineRangeBody());
     assert(range.start < now, "Default start is before now");
   });
 
   it('should have end default after now', () => {
-    const now = moment().hours(0).minutes(0).seconds(0).milliseconds(0).valueOf();
+    const now = new Date().setHours(0, 0, 0, 0);
     const range = new Range(TestSupport.buildSimpleTimelineRangeBody());
     assert(range.end > now, "Default end is after now");
   });

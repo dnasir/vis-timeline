@@ -1,6 +1,5 @@
 import assert from 'assert'
 import jsdom_global from 'jsdom-global'
-import moment from '../lib/module/moment'
 import TimeStep from '../lib/timeline/TimeStep'
 
 const internals = {}
@@ -51,45 +50,45 @@ describe('TimeStep', () => {
     const timestep = new TimeStep(new Date(2017, 3, 3), new Date(2017, 3, 5));
     timestep.setScale({ scale: 'year', step: 1 });
     timestep.start();
-    assert.equal(timestep.getCurrent().unix(), moment("2017-01-01T00:00:00.000").unix(), "should have the right initial value");
+    assert.equal(timestep.getCurrent().valueOf(), new Date(2017, 0, 1, 0, 0, 0, 0).valueOf(), "should have the right initial value");
     timestep.next();
-    assert.equal(timestep.getCurrent().unix(), moment("2018-01-01T00:00:00.000").unix(), "should have the right value after a step");
+    assert.equal(timestep.getCurrent().valueOf(), new Date(2018, 0, 1, 0, 0, 0, 0).valueOf(), "should have the right value after a step");
   });
 
   it('should perform the step with a specified scale (1 month)', () => {
     const timestep = new TimeStep(new Date(2017, 3, 3), new Date(2017, 3, 5));
     timestep.setScale({ scale: 'month', step: 1 });
     timestep.start();
-    assert.equal(timestep.getCurrent().unix(), moment("2017-04-01T00:00:00.000").unix(), "should have the right initial value");
+    assert.equal(timestep.getCurrent().valueOf(), new Date(2017, 3, 1, 0, 0, 0, 0).valueOf(), "should have the right initial value");
     timestep.next();
-    assert.equal(timestep.getCurrent().unix(), moment("2017-05-01T00:00:00.000").unix(), "should have the right value after a step");
+    assert.equal(timestep.getCurrent().valueOf(), new Date(2017, 4, 1, 0, 0, 0, 0).valueOf(), "should have the right value after a step");
   });
 
   it('should perform the step with a specified scale (1 week)', () => {
     const timestep = new TimeStep(new Date(2017, 3, 3), new Date(2017, 3, 5));
     timestep.setScale({ scale: 'week', step: 1 });
     timestep.start();
-    assert.equal(timestep.getCurrent().unix(), moment("2017-04-02T00:00:00.000").unix(), "should have the right initial value");
+    assert.equal(timestep.getCurrent().valueOf(), new Date(2017, 3, 2, 0, 0, 0, 0).valueOf(), "should have the right initial value");
     timestep.next();
-    assert.equal(timestep.getCurrent().unix(), moment("2017-04-09T00:00:00.000").unix(), "should have the right value after a step");
+    assert.equal(timestep.getCurrent().valueOf(), new Date(2017, 3, 9, 0, 0, 0, 0).valueOf(), "should have the right value after a step");
   });
 
   it('should perform the step with a specified scale (1 day)', () => {
     const timestep = new TimeStep(new Date(2017, 3, 3), new Date(2017, 3, 5));
     timestep.setScale({ scale: 'day', step: 1 });
     timestep.start();
-    assert.equal(timestep.getCurrent().unix(), moment("2017-04-03T00:00:00.000").unix(), "should have the right initial value");
+    assert.equal(timestep.getCurrent().valueOf(), new Date(2017, 3, 3, 0, 0, 0, 0).valueOf(), "should have the right initial value");
     timestep.next();
-    assert.equal(timestep.getCurrent().unix(), moment("2017-04-04T00:00:00.000").unix(), "should have the right value after a step");
+    assert.equal(timestep.getCurrent().valueOf(), new Date(2017, 3, 4, 0, 0, 0, 0).valueOf(), "should have the right value after a step");
   });
 
   it('should perform the step with a specified scale (1 hour)', () => {
     const timestep = new TimeStep(new Date(2017, 3, 3), new Date(2017, 3, 5));
     timestep.setScale({ scale: 'hour', step: 1 });
     timestep.start();
-    assert.equal(timestep.getCurrent().unix(), moment("2017-04-03T00:00:00.000").unix(), "should have the right initial value");
+    assert.equal(timestep.getCurrent().valueOf(), new Date(2017, 3, 3, 0, 0, 0, 0).valueOf(), "should have the right initial value");
     timestep.next();
-    assert.equal(timestep.getCurrent().unix(), moment("2017-04-03T01:00:00.000").unix(), "should have the right value after a step");
+    assert.equal(timestep.getCurrent().valueOf(), new Date(2017, 3, 3, 1, 0, 0, 0).valueOf(), "should have the right value after a step");
   });
 
 });
