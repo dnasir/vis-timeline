@@ -8,9 +8,10 @@ const internals = {}
 
 describe('Timeline PointItem', () => {
   
-  const now = new Date();
+  let now;
 
   before(() => {
+    now = new Date();
     internals.jsdom_global = jsdom_global();
   });
 
@@ -36,16 +37,20 @@ describe('Timeline PointItem', () => {
 
   it('should be visible if the range is during', () => {
     const range = new Range(TestSupport.buildSimpleTimelineRangeBody());
-    range.start = new Date(now).setSeconds(now.getSeconds() - 1);
-    range.end = new Date(range.start).setHours(range.start.getHours() + 1);
+    range.start = new Date(now);
+    range.start.setSeconds(now.getSeconds() - 1);
+    range.end = new Date(range.start);
+    range.end.setHours(range.start.getHours() + 1);
     const pointItem = new PointItem({start: now}, null, null);
     assert(pointItem.isVisible(range));
   });
 
   it('should not be visible if the range is after', () => {
     const range = new Range(TestSupport.buildSimpleTimelineRangeBody());
-    range.start = new Date(now).setSeconds(now.getSeconds() + 1);
-    range.end = new Date(range.start).setHours(range.start.getHours() + 1);
+    range.start = new Date(now);
+    range.start.setSeconds(now.getSeconds() + 1);
+    range.end = new Date(range.start);
+    range.end.setHours(range.start.getHours() + 1);
     const pointItem = new PointItem({start: now}, null, null);
     assert(!pointItem.isVisible(range));
   });
@@ -53,8 +58,10 @@ describe('Timeline PointItem', () => {
   it('should not be visible if the range is before', () => {
     const now = new Date();
     const range = new Range(TestSupport.buildSimpleTimelineRangeBody());
-    range.end = new Date(now).setSeconds(now.getSeconds() - 1);
-    range.start = new Date(range.end).setHours(range.start.getHours() - 1);
+    range.end = new Date(now);
+    range.end.setSeconds(now.getSeconds() - 1);
+    range.start = new Date(range.end)
+    range.start.setHours(range.start.getHours() - 1);
     const pointItem = new PointItem({start: now}, null, null);
     assert(!pointItem.isVisible(range));
   });
