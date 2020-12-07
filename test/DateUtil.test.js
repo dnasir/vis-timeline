@@ -1,4 +1,5 @@
 import assert from 'assert';
+import jsdom_global from 'jsdom-global';
 import {
   convertHiddenOptions,
   correctTimeForHidden,
@@ -14,8 +15,20 @@ import {
 } from '../lib/timeline/DateUtil';
 import TimeStep from '../lib/timeline/TimeStep';
 import moment from '../lib/module/moment';
+import Range from '../lib/timeline/Range';
+import TestSupport from './TestSupport';
+
+const internals = {}
 
 describe('DateUtil', () => {
+  before(() => {
+    internals.jsdom_global = jsdom_global();
+  });
+
+  after(() => {
+      internals.jsdom_global();
+  });
+
   describe('convertHiddenOptions', () => {
     let body;
 
@@ -23,16 +36,16 @@ describe('DateUtil', () => {
       body = {};
     });
 
-    // it('should throw when passed invalid values', () => {
-    //   assert.throws(() => convertHiddenOptions(moment, body, {
-    //     start: 'lorem ipsum',
-    //     end: '2014-03-28 00:00:00',
-    //   }), new Error('Supplied start date is not valid: lorem ipsum'));
-    //   assert.throws(() => convertHiddenOptions(moment, body, {
-    //     start: '2014-03-21 00:00:00',
-    //     end: 'dolor sit',
-    //   }), new Error('Supplied end date is not valid: dolor sit'));
-    // });
+    it('should throw when passed invalid values', () => {
+      assert.throws(() => convertHiddenOptions(body, {
+        start: 'lorem ipsum',
+        end: '2014-03-28 00:00:00',
+      }), new Error('Supplied start date is not valid: lorem ipsum'));
+      assert.throws(() => convertHiddenOptions(body, {
+        start: '2014-03-21 00:00:00',
+        end: 'dolor sit',
+      }), new Error('Supplied end date is not valid: dolor sit'));
+    });
 
     it('should build hidden dates list (object)', () => {
       const data = {
@@ -42,7 +55,7 @@ describe('DateUtil', () => {
       const startDate = new Date(data.start).valueOf();
       const endDate = new Date(data.end).valueOf();
 
-      convertHiddenOptions(moment, body, data);
+      convertHiddenOptions(body, data);
 
       assert.strictEqual(body.hiddenDates.length, 1, 'should have correct number of items');
       assert.strictEqual(typeof body.hiddenDates[0].start, 'number', 'should convert string to number');
@@ -67,7 +80,7 @@ describe('DateUtil', () => {
       const startDate2 = new Date(data[1].start).valueOf();
       const endDate2 = new Date(data[1].end).valueOf();
 
-      convertHiddenOptions(moment, body, data);
+      convertHiddenOptions(body, data);
 
       assert.strictEqual(body.hiddenDates.length, 2, 'should have correct number of items');
       assert.strictEqual(typeof body.hiddenDates[0].start, 'number', 'should convert string to number');
@@ -82,18 +95,16 @@ describe('DateUtil', () => {
   });
 
   describe('updateHiddenDates', () => {
-    let body;
-
     beforeEach(() => {
-      body = {};
+      internals.body = TestSupport.buildSimpleTimelineRangeBody();
     });
 
-    it('should do nothing when `hiddenDates` param is null or undefined', () => {
-      updateHiddenDates(moment, body, null);
-      assert.strictEqual(Object.keys(body).length, 0, 'should be empty object');
-      updateHiddenDates(moment, body, undefined);
-      assert.strictEqual(Object.keys(body).length, 0, 'should be empty object');
-    });
+    // it('should do nothing when `hiddenDates` param is null or undefined', () => {
+    //   updateHiddenDates(moment, internals.body, null);
+    //   assert.strictEqual(Object.keys(internals.body).length, 0, 'should be empty object');
+    //   updateHiddenDates(moment, internals.body, undefined);
+    //   assert.strictEqual(Object.keys(internals.body).length, 0, 'should be empty object');
+    // });
 
     // it('should do nothing when `body.domProps` is undefined or has missing props', () => {
     //   updateHiddenDates(moment, body, []);
@@ -105,6 +116,28 @@ describe('DateUtil', () => {
     //   updateHiddenDates(moment, body, []);
     //   assert.strictEqual(Object.keys(body).length, 0, 'should be empty object');
     // });
+
+    it('should not update hiddenDates (object)', () => {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      const hiddenDates = [
+        // {
+        //   start: new Date(now).setDate(now.getDate() - 2),
+        //   end: new Date(now).setDate(now.getDate() - 1),
+        // },
+        // {
+        //   start: new Date(now).setDate(now.getDate() + 1),
+        //   end: new Date(now).setDate(now.getDate() + 2),
+        // }
+      ];
+      internals.body.range = new Range(internals.body);
+      const rangeStart = internals.body.range.start;
+      const rangeEnd = internals.body.range.end;
+      updateHiddenDates(moment, internals.body, hiddenDates);
+
+      assert.strictEqual(internals.body.range.start, rangeStart, 'should not have changed');
+      assert.strictEqual(internals.body.range.end, rangeEnd, 'should not have changed');
+    });
   });
 
   describe('removeDuplicates', () => {
