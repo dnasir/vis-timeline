@@ -36,107 +36,272 @@ describe('DateUtil', () => {
       body = {};
     });
 
-    it('should throw when passed invalid values', () => {
-      assert.throws(() => convertHiddenOptions(body, {
-        start: 'lorem ipsum',
-        end: '2014-03-28 00:00:00',
-      }), new Error('Supplied start date is not valid: lorem ipsum'));
-      assert.throws(() => convertHiddenOptions(body, {
-        start: '2014-03-21 00:00:00',
-        end: 'dolor sit',
-      }), new Error('Supplied end date is not valid: dolor sit'));
-    });
+    // describe('safety checks', function() {
+    //   it('should throw when passed invalid values', () => {
+    //     assert.throws(() => convertHiddenOptions(moment, body, {
+    //       start: 'lorem ipsum',
+    //       end: '2014-03-28 00:00:00',
+    //     }), new Error('Supplied start date is not valid: lorem ipsum'));
+    //     assert.throws(() => convertHiddenOptions(moment, body, {
+    //       start: '2014-03-21 00:00:00',
+    //       end: 'dolor sit',
+    //     }), new Error('Supplied end date is not valid: dolor sit'));
+    //   });
+    // });
 
-    it('should build hidden dates list (object)', () => {
-      const data = {
-        start: '2014-03-21 00:00:00',
-        end: '2014-03-28 00:00:00',
-      };
-      const startDate = new Date(data.start).valueOf();
-      const endDate = new Date(data.end).valueOf();
-
-      convertHiddenOptions(body, data);
-
-      assert.strictEqual(body.hiddenDates.length, 1, 'should have correct number of items');
-      assert.strictEqual(typeof body.hiddenDates[0].start, 'number', 'should convert string to number');
-      assert.strictEqual(body.hiddenDates[0].start, startDate, 'timestamp value should match original date string');
-      assert.strictEqual(typeof body.hiddenDates[0].end, 'number', 'should convert string to number');
-      assert.strictEqual(body.hiddenDates[0].end, endDate, 'timestamp value should match original date string');
-    });
-
-    it('should build hidden dates list (array)', () => {
-      const data = [
-        {
+    describe('feature tests', function () {
+      it('should build hidden dates list (object)', () => {
+        const data = {
           start: '2014-03-21 00:00:00',
           end: '2014-03-28 00:00:00',
-        },
-        {
-          start: '2014-03-12 00:00:00',
-          end: '2014-04-01 00:00:00',
-        }
-      ];
-      const startDate1 = new Date(data[0].start).valueOf();
-      const endDate1 = new Date(data[0].end).valueOf();
-      const startDate2 = new Date(data[1].start).valueOf();
-      const endDate2 = new Date(data[1].end).valueOf();
+        };
+        const startDate = new Date(data.start).valueOf();
+        const endDate = new Date(data.end).valueOf();
 
-      convertHiddenOptions(body, data);
+        convertHiddenOptions(moment, body, data);
 
-      assert.strictEqual(body.hiddenDates.length, 2, 'should have correct number of items');
-      assert.strictEqual(typeof body.hiddenDates[0].start, 'number', 'should convert string to number');
-      assert.strictEqual(body.hiddenDates[0].start, startDate2, 'timestamp value should match original date string');
-      assert.strictEqual(typeof body.hiddenDates[0].end, 'number', 'should convert string to number');
-      assert.strictEqual(body.hiddenDates[0].end, endDate2, 'timestamp value should match original date string');
-      assert.strictEqual(typeof body.hiddenDates[1].start, 'number', 'should convert string to number');
-      assert.strictEqual(body.hiddenDates[1].start, startDate1, 'timestamp value should match original date string');
-      assert.strictEqual(typeof body.hiddenDates[1].end, 'number', 'should convert string to number');
-      assert.strictEqual(body.hiddenDates[1].end, endDate1, 'timestamp value should match original date string');
+        assert.strictEqual(body.hiddenDates.length, 1, 'should have correct number of items');
+        assert.strictEqual(typeof body.hiddenDates[0].start, 'number', 'should convert string to number');
+        assert.strictEqual(body.hiddenDates[0].start, startDate, 'timestamp value should match original date string');
+        assert.strictEqual(typeof body.hiddenDates[0].end, 'number', 'should convert string to number');
+        assert.strictEqual(body.hiddenDates[0].end, endDate, 'timestamp value should match original date string');
+      });
+
+      it('should build hidden dates list (array)', () => {
+        const data = [
+          {
+            start: '2014-03-21 00:00:00',
+            end: '2014-03-28 00:00:00',
+          },
+          {
+            start: '2014-03-12 00:00:00',
+            end: '2014-04-01 00:00:00',
+          }
+        ];
+        const startDate1 = new Date(data[0].start).valueOf();
+        const endDate1 = new Date(data[0].end).valueOf();
+        const startDate2 = new Date(data[1].start).valueOf();
+        const endDate2 = new Date(data[1].end).valueOf();
+
+        convertHiddenOptions(moment, body, data);
+
+        assert.strictEqual(body.hiddenDates.length, 2, 'should have correct number of items');
+        assert.strictEqual(typeof body.hiddenDates[0].start, 'number', 'should convert string to number');
+        assert.strictEqual(body.hiddenDates[0].start, startDate2, 'timestamp value should match original date string');
+        assert.strictEqual(typeof body.hiddenDates[0].end, 'number', 'should convert string to number');
+        assert.strictEqual(body.hiddenDates[0].end, endDate2, 'timestamp value should match original date string');
+        assert.strictEqual(typeof body.hiddenDates[1].start, 'number', 'should convert string to number');
+        assert.strictEqual(body.hiddenDates[1].start, startDate1, 'timestamp value should match original date string');
+        assert.strictEqual(typeof body.hiddenDates[1].end, 'number', 'should convert string to number');
+        assert.strictEqual(body.hiddenDates[1].end, endDate1, 'timestamp value should match original date string');
+      });
     });
   });
 
-  describe('updateHiddenDates', () => {
-    beforeEach(() => {
-      internals.body = TestSupport.buildSimpleTimelineRangeBody();
+  describe('updateHiddenDates', function () {
+    describe('safety checks', function() {
+      beforeEach(function () {
+        internals.body = TestSupport.buildSimpleTimelineRangeBody();
+        internals.body.range = new Range(internals.body, {
+          start: new Date(2020, 11, 8, 0, 0, 0, 0),
+          end: new Date(2020, 11, 8, 23, 59, 59, 999)
+        });
+      });
+
+      // it('should throw when body range has invalid values', function () {
+      //   internals.body.range = {
+      //     start: 'lorem ipsum',
+      //     end: new Date(2020, 11, 8, 23, 59, 59, 999)
+      //   };
+      //   assert.throws(() => updateHiddenDates(moment, internals.body, []), new Error('Supplied start date is not valid: lorem ipsum'));
+      //   internals.body.range = {
+      //     start: new Date(2020, 11, 8, 0, 0, 0, 0),
+      //     end: 'lorem ipsum'
+      //   };
+      //   assert.throws(() => updateHiddenDates(moment, internals.body, []), new Error('Supplied end date is not valid: lorem ipsum'));
+      // });
+
+      it('should do nothing when `hiddenDates` param is null or undefined', function () {
+        const expected = Object.freeze(Object.assign({}, internals.body));
+        updateHiddenDates(moment, internals.body, null);
+        assert.deepStrictEqual(internals.body, expected, 'should not have changed');
+        updateHiddenDates(moment, internals.body, undefined);
+        assert.deepStrictEqual(internals.body, expected, 'should not have changed');
+      });
+
+      it('should do nothing when `body.domProps` is undefined or has missing props', function () {
+        let expected = Object.freeze(Object.assign({}, internals.body));
+        updateHiddenDates(moment, internals.body, []);
+        assert.deepStrictEqual(internals.body, expected, 'should not have changed');
+        internals.body.domProps = {};
+        expected = Object.freeze(Object.assign({}, internals.body));
+        updateHiddenDates(moment, internals.body, []);
+        assert.deepStrictEqual(internals.body, expected, 'should not have changed');
+        internals.body.domProps.centerContainer = {};
+        expected = Object.freeze(Object.assign({}, internals.body));
+        updateHiddenDates(moment, internals.body, []);
+        assert.deepStrictEqual(internals.body, expected, 'should not have changed');
+      });
+      
+      it('should handle object type hiddenDates', function () {
+        const hiddenDates = {
+          start: new Date(2020, 11, 8, 0, 0, 0, 0),
+          end: new Date(2020, 11, 8, 1, 0, 0, 0)
+        };
+        let expected = Object.freeze(
+          Object.assign({}, internals.body, {
+            hiddenDates: [
+              {
+                start: hiddenDates.start.valueOf(),
+                end: hiddenDates.end.valueOf()
+              }
+            ]
+          })
+        );
+        updateHiddenDates(moment, internals.body, hiddenDates);
+        assert.deepStrictEqual(internals.body, expected, 'should have added given hiddenDates object');
+      });
+
+      it('should handle array of hiddenDates', function () {
+        const hiddenDates = {
+          start: new Date(2020, 11, 8, 0, 0, 0, 0),
+          end: new Date(2020, 11, 8, 1, 0, 0, 0)
+        };
+        let expected = Object.freeze(
+          Object.assign({}, internals.body, {
+            hiddenDates: [
+              {
+                start: hiddenDates.start.valueOf(),
+                end: hiddenDates.end.valueOf()
+              }
+            ]
+          })
+        );
+        updateHiddenDates(moment, internals.body, [hiddenDates]);
+        assert.deepStrictEqual(internals.body, expected, 'should have added given hiddenDates array');
+      });
     });
 
-    // it('should do nothing when `hiddenDates` param is null or undefined', () => {
-    //   updateHiddenDates(moment, internals.body, null);
-    //   assert.strictEqual(Object.keys(internals.body).length, 0, 'should be empty object');
-    //   updateHiddenDates(moment, internals.body, undefined);
-    //   assert.strictEqual(Object.keys(internals.body).length, 0, 'should be empty object');
-    // });
+    describe('feature tests', function () {
+      beforeEach(function () {
+        internals.body = TestSupport.buildSimpleTimelineRangeBody();
+      });
 
-    // it('should do nothing when `body.domProps` is undefined or has missing props', () => {
-    //   updateHiddenDates(moment, body, []);
-    //   assert.strictEqual(Object.keys(body).length, 0, 'should be empty object');
-    //   body.domProps = {};
-    //   updateHiddenDates(moment, body, []);
-    //   assert.strictEqual(Object.keys(body).length, 0, 'should be empty object');
-    //   body.domProps.centerContainer = {};
-    //   updateHiddenDates(moment, body, []);
-    //   assert.strictEqual(Object.keys(body).length, 0, 'should be empty object');
-    // });
+      it('should add repeated hiddenDates to given body (daily)', function () {
+        internals.body.range = new Range(internals.body, {
+          start: new Date(2020, 11, 6, 0, 0, 0, 0),
+          end: new Date(2020, 11, 12, 0, 0, 0, 0)
+        });
 
-    it('should not update hiddenDates (object)', () => {
-      const now = new Date();
-      now.setHours(0, 0, 0, 0);
-      const hiddenDates = [
-        // {
-        //   start: new Date(now).setDate(now.getDate() - 2),
-        //   end: new Date(now).setDate(now.getDate() - 1),
-        // },
-        // {
-        //   start: new Date(now).setDate(now.getDate() + 1),
-        //   end: new Date(now).setDate(now.getDate() + 2),
-        // }
-      ];
-      internals.body.range = new Range(internals.body);
-      const rangeStart = internals.body.range.start;
-      const rangeEnd = internals.body.range.end;
-      updateHiddenDates(moment, internals.body, hiddenDates);
+        const hiddenDates = {
+          start: new Date(2020, 11, 8, 10, 0, 0, 0),
+          end: new Date(2020, 11, 8, 11, 0, 0, 0),
+          repeat: 'daily'
+        };
 
-      assert.strictEqual(internals.body.range.start, rangeStart, 'should not have changed');
-      assert.strictEqual(internals.body.range.end, rangeEnd, 'should not have changed');
+        updateHiddenDates(moment, internals.body, hiddenDates);
+
+        assert.strictEqual(internals.body.hiddenDates.length, 21, 'should have added repeated dates');
+        assert.deepStrictEqual(
+          internals.body.hiddenDates[0], {
+            start: new Date(2020, 10, 29, 10, 0, 0, 0).valueOf(),
+            end: new Date(2020, 10, 29, 11, 0, 0, 0).valueOf()
+          }
+        );
+        assert.deepStrictEqual(
+          internals.body.hiddenDates[internals.body.hiddenDates.length - 1], {
+            start: new Date(2020, 11, 19, 10, 0, 0, 0).valueOf(),
+            end: new Date(2020, 11, 19, 11, 0, 0, 0).valueOf()
+          }
+        );
+      });
+
+      it('should add repeated hiddenDates to given body (weekly)', function () {
+        internals.body.range = new Range(internals.body, {
+          start: new Date(2020, 11, 6, 0, 0, 0, 0),
+          end: new Date(2020, 11, 12, 0, 0, 0, 0)
+        });
+
+        const hiddenDates = {
+          start: new Date(2020, 11, 8, 10, 0, 0, 0),
+          end: new Date(2020, 11, 8, 11, 0, 0, 0),
+          repeat: 'weekly'
+        };
+
+        updateHiddenDates(moment, internals.body, hiddenDates);
+
+        assert.strictEqual(internals.body.hiddenDates.length, 4, 'should have added repeated dates');
+        assert.deepStrictEqual(
+          internals.body.hiddenDates[0], {
+            start: new Date(2020, 11, 1, 10, 0, 0, 0).valueOf(),
+            end: new Date(2020, 11, 1, 10, 0, 0, 0).valueOf() // is this correct?
+          }
+        );
+        assert.deepStrictEqual(
+          internals.body.hiddenDates[internals.body.hiddenDates.length - 1], {
+            start: new Date(2020, 11, 22, 10, 0, 0, 0).valueOf(),
+            end: new Date(2020, 11, 22, 10, 0, 0, 0).valueOf() // is this correct?
+          }
+        );
+      });
+
+      it('should add repeated hiddenDates to given body (monthly)', function () {
+        internals.body.range = new Range(internals.body, {
+          start: new Date(2020, 11, 6, 0, 0, 0, 0),
+          end: new Date(2020, 11, 12, 0, 0, 0, 0)
+        });
+
+        const hiddenDates = {
+          start: new Date(2020, 11, 8, 10, 0, 0, 0),
+          end: new Date(2020, 11, 8, 11, 0, 0, 0),
+          repeat: 'monthly'
+        };
+
+        updateHiddenDates(moment, internals.body, hiddenDates);
+
+        assert.strictEqual(internals.body.hiddenDates.length, 4, 'should have added repeated dates');
+        assert.deepStrictEqual(
+          internals.body.hiddenDates[0], {
+            start: new Date(2020, 10, 8, 10, 0, 0, 0).valueOf(),
+            end: new Date(2020, 10, 8, 11, 0, 0, 0).valueOf()
+          }
+        );
+        assert.deepStrictEqual(
+          internals.body.hiddenDates[internals.body.hiddenDates.length - 1], {
+            start: new Date(2021, 1, 8, 10, 0, 0, 0).valueOf(),
+            end: new Date(2021, 1, 8, 11, 0, 0, 0).valueOf()
+          }
+        );
+      });
+
+      it('should add repeated hiddenDates to given body (yearly)', function () {
+        internals.body.range = new Range(internals.body, {
+          start: new Date(2020, 11, 6, 0, 0, 0, 0),
+          end: new Date(2020, 11, 12, 0, 0, 0, 0)
+        });
+
+        const hiddenDates = {
+          start: new Date(2020, 11, 8, 10, 0, 0, 0),
+          end: new Date(2020, 11, 8, 11, 0, 0, 0),
+          repeat: 'yearly'
+        };
+
+        updateHiddenDates(moment, internals.body, hiddenDates);
+
+        assert.strictEqual(internals.body.hiddenDates.length, 4, 'should have added repeated dates');
+        assert.deepStrictEqual(
+          internals.body.hiddenDates[0], {
+            start: new Date(2019, 11, 8, 10, 0, 0, 0).valueOf(),
+            end: new Date(2019, 11, 8, 11, 0, 0, 0).valueOf()
+          }
+        );
+        assert.deepStrictEqual(
+          internals.body.hiddenDates[internals.body.hiddenDates.length - 1], {
+            start: new Date(2022, 11, 8, 10, 0, 0, 0).valueOf(),
+            end: new Date(2022, 11, 8, 11, 0, 0, 0).valueOf()
+          }
+        );
+      });
     });
   });
 
