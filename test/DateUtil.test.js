@@ -108,18 +108,18 @@ describe('DateUtil', () => {
         });
       });
 
-      // it('should throw when body range has invalid values', function () {
-      //   internals.body.range = {
-      //     start: 'lorem ipsum',
-      //     end: new Date(2020, 11, 8, 23, 59, 59, 999)
-      //   };
-      //   assert.throws(() => updateHiddenDates(moment, internals.body, []), new Error('Supplied start date is not valid: lorem ipsum'));
-      //   internals.body.range = {
-      //     start: new Date(2020, 11, 8, 0, 0, 0, 0),
-      //     end: 'lorem ipsum'
-      //   };
-      //   assert.throws(() => updateHiddenDates(moment, internals.body, []), new Error('Supplied end date is not valid: lorem ipsum'));
-      // });
+      it('should throw when passed invalid dates', function () {
+        assert.throws(() => updateHiddenDates(moment, internals.body, {
+          start: 'lorem ipsum',
+          end: new Date(2020, 11, 8, 23, 59, 59, 999),
+          repeat: 'daily'
+        }), new Error('Supplied start date is not valid: lorem ipsum'));
+        assert.throws(() => updateHiddenDates(moment, internals.body, {
+          start: new Date(2020, 11, 8, 0, 0, 0, 0),
+          end: 'lorem ipsum',
+          repeat: 'daily'
+        }), new Error('Supplied end date is not valid: lorem ipsum'));
+      });
 
       it('should do nothing when `hiddenDates` param is null or undefined', function () {
         const expected = Object.freeze(Object.assign({}, internals.body));
@@ -129,17 +129,21 @@ describe('DateUtil', () => {
         assert.deepStrictEqual(internals.body, expected, 'should not have changed');
       });
 
+      it('should do nothing when `repeat` param is invalid', function () {
+        const expected = Object.freeze(Object.assign({}, internals.body));
+        updateHiddenDates(moment, internals.body, null);
+        assert.deepStrictEqual(internals.body, expected, 'should not have changed');
+        updateHiddenDates(moment, internals.body, undefined);
+        assert.deepStrictEqual(internals.body, expected, 'should not have changed');
+      });
+
       it('should do nothing when `body.domProps` is undefined or has missing props', function () {
         let expected = Object.freeze(Object.assign({}, internals.body));
-        updateHiddenDates(moment, internals.body, []);
-        assert.deepStrictEqual(internals.body, expected, 'should not have changed');
-        internals.body.domProps = {};
-        expected = Object.freeze(Object.assign({}, internals.body));
-        updateHiddenDates(moment, internals.body, []);
-        assert.deepStrictEqual(internals.body, expected, 'should not have changed');
-        internals.body.domProps.centerContainer = {};
-        expected = Object.freeze(Object.assign({}, internals.body));
-        updateHiddenDates(moment, internals.body, []);
+        updateHiddenDates(moment, internals.body, {
+          start: new Date(2020, 11, 8, 10, 0, 0, 0),
+          end: new Date(2020, 11, 8, 11, 0, 0, 0),
+          repeat: 'lorem'
+        });
         assert.deepStrictEqual(internals.body, expected, 'should not have changed');
       });
       
