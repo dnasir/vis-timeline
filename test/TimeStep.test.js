@@ -106,7 +106,7 @@ describe('TimeStep', () => {
     assert.strictEqual(timestep.getCurrent().valueOf(), new Date(2017, 3, 3, 0, 5, 0, 0).valueOf(), "should have the right value after a step (step=2)");
   });
 
-  describe.only('snap', function() {
+  describe('snap', function() {
     it('should snap to closest rounded value (year)', function() {
       assert.strictEqual(TimeStep.snap(new Date(2020, 3, 3), 'year', 1).valueOf(), new Date(2020, 0, 1).valueOf(), "should have snapped to the beginning of current year");
       assert.strictEqual(TimeStep.snap(new Date(2020, 8, 3), 'year', 1).valueOf(), new Date(2021, 0, 1).valueOf(), "should have snapped to the beginning of next year");
