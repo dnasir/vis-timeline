@@ -1,6 +1,7 @@
 import assert from 'assert'
 import jsdom_global from 'jsdom-global'
 import TimeStep from '../lib/timeline/TimeStep'
+import * as sinon from 'sinon';
 import mockery from 'mockery';
 
 const internals = {}
@@ -287,19 +288,30 @@ describe('TimeStep', () => {
 
   describe('getClassName', function () {
     // Stub to ensure we get the same value for `new Date()` and `Date.now()` every single time it's called.
-    let mockDate = global.Date;
-    mockDate.constructor = (value) => {
-      if(value) return global.Date(value);
-      return new Date(1575763200000);
-    };
-    mockDate.now = () => 1575763200000;
+    // let mockDate = global.Date;
+    // mockDate.constructor = (value) => {
+    //   if(value) return global.Date(value);
+    //   return new Date(2019, 11, 8, 0, 0, 0, 0);
+    // };
+    // mockDate.now = () => new Date(2019, 11, 8, 0, 0, 0, 0).valueOf();
+    let sandbox;
 
-    before(function () {
-      mockery.registerMock('../module/date', mockDate);
+    beforeEach(function () {
+      // sinon.stub(global.Date, 'now').value(() => new Date(2019, 11, 8, 0, 0, 0, 0).valueOf());
+      sandbox = sinon.createSandbox({
+        useFakeTimers: {
+          now: new Date(2019, 11, 8, 0, 0, 0, 0)
+        }
+      });
+      // mockery.registerMock('../module/date', mockDate);
+      // mockery.enable();
     });
 
-    after(function () {
-      mockery.disable();
+    afterEach(function () {
+      // sinon.restore();
+      sandbox.reset();
+      // mockery.deregisterAll();
+      // mockery.disable();
     });
 
     it('should return the correct class name (year)', function () {
